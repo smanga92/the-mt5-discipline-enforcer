@@ -470,7 +470,7 @@ class MT5DisciplineTracker {
 
     openMT5() {
        // Try to open MT5
-       const mt5Intent = 'intent://net.metaquotes.metatrader5/#Intent;scheme=https;package=net.metaquotes.metatrader5;end';
+       const mt5Intent = 'intent:///#Intent;package=net.metaquotes.metatrader5;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
        
        try {
            window.location.href = mt5Intent;
