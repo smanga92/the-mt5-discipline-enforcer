@@ -470,13 +470,8 @@ class MT5DisciplineTracker {
 
     openMT5() {
        // Try to open MT5
-       Intent launchIntent = getPackageManager().getLaunchIntentForPackage("net.metaquotes.metatrader5");
-       if (launchIntent != null) {
-           startActivity(launchIntent);
-       } else {
-           // MT5 not found, maybe open Play Store or show error
-       }
-
+       const mt5Intent = 'intent:///#Intent;package=net.metaquotes.metatrader5;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
+	   
        try {
            window.location.href = mt5Intent;
        } catch (error) {
