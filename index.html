@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MT5 Discipline Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MT5 Discipline Tracker</h1>
+            <div class="streak-counter">
+                <span id="streak">Streak: 0 days</span>
+            </div>
+            <button id="admin-access" class="admin-btn">⚙️</button>
+        </header>
+
+        <!-- PIN Entry Screen -->
+        <div id="pin-screen" class="screen">
+            <h2>Admin Access</h2>
+            <div class="pin-section">
+                <label for="pin-input">Enter Admin PIN:</label>
+                <input type="password" id="pin-input" placeholder="Enter PIN">
+                <button id="verify-pin" class="primary-btn">Access Admin</button>
+                <button id="cancel-pin" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Admin/Backend Setup Screen -->
+        <div id="admin-screen" class="screen">
+            <h2>Admin Configuration</h2>
+            
+            <div class="admin-section">
+                <h3>Security Settings</h3>
+                <div class="setting-item">
+                    <label>Change Admin PIN:</label>
+                    <input type="password" id="new-pin" placeholder="New PIN (4-6 digits)">
+                    <button id="update-pin" class="secondary-btn">Update PIN</button>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h3>Trading Rules Checklist</h3>
+                <div id="admin-checklist-builder">
+                    <!-- Checklist items will be populated here -->
+                </div>
+                <button id="add-admin-checklist-item" class="add-btn">+ Add Rule</button>
+            </div>
+            
+            <div class="admin-section">
+                <h3>App Behavior Settings</h3>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enable-reflection">
+                        Enable "Last Session Reflection" screen
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enable-cooldown">
+                        Enable cooldown timer
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>Cooldown duration (minutes):</label>
+                    <input type="number" id="admin-delay-input" min="1" max="60" value="5">
+                </div>
+            </div>
+            
+            <div class="admin-actions">
+                <button id="save-admin-config" class="primary-btn">Save Configuration</button>
+                <button id="export-data" class="secondary-btn">Export Session Data</button>
+                <button id="clear-all-data" class="danger-btn">Clear All Data</button>
+                <button id="exit-admin" class="secondary-btn">Exit Admin</button>
+            </div>
+        </div>
+
+        <!-- Session Reflection Screen -->
+        <div id="reflection-screen" class="screen">
+            <h2>How Was Your Last Trading Session?</h2>
+            <div class="reflection-section">
+                <div class="question">
+                    <label>Did you follow all your trading rules last session?</label>
+                    <select id="followed-rules" required>
+                        <option value="">Select...</option>
+                        <option value="yes">Yes, completely</option>
+                        <option value="mostly">Mostly (minor deviations)</option>
+                        <option value="partially">Partially</option>
+                        <option value="no">No, I broke multiple rules</option>
+                    </select>
+                </div>
+                
+                <div class="question">
+                    <label>What mistakes (if any) did you make?</label>
+                    <textarea id="mistakes-made" placeholder="Describe any mistakes or rule violations..."></textarea>
+                </div>
+                
+                <div class="question">
+                    <label>What did you learn from the last session?</label>
+                    <textarea id="lessons-learned" placeholder="Key insights or lessons..."></textarea>
+                </div>
+                
+                <div class="question">
+                    <label>How do you feel emotionally going into today?</label>
+                    <select id="current-emotion" required>
+                        <option value="">Select...</option>
+                        <option value="confident">Confident & Ready</option>
+                        <option value="calm">Calm & Focused</option>
+                        <option value="neutral">Neutral</option>
+                        <option value="anxious">Anxious</option>
+                        <option value="frustrated">Frustrated from yesterday</option>
+                        <option value="overconfident">Overconfident</option>
+                        <option value="revenge">Seeking revenge trades</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <label>Rate your discipline from last session (1-10):</label>
+                    <input type="range" id="discipline-rating" min="1" max="10" value="5">
+                    <span id="discipline-value">5</span>
+                </div>
+            </div>
+            
+            <button id="submit-reflection" class="primary-btn">Submit Reflection</button>
+        </div>
+
+        <!-- Trading Rules Checklist Screen -->
+        <div id="checklist-screen" class="screen">
+            <h2>Trading Rules Checklist</h2>
+            <p class="checklist-instruction">Review and acknowledge each trading rule before proceeding:</p>
+            <div id="checklist-container">
+                <!-- Checklist items will be populated here -->
+            </div>
+            <button id="complete-checklist" class="primary-btn" disabled>I Acknowledge All Rules</button>
+        </div>
+
+        <!-- Timer Screen -->
+        <div id="timer-screen" class="screen">
+            <h2>Cooling Off Period</h2>
+            <div class="timer-display">
+                <div id="timer-circle">
+                    <span id="timer-text">5:00</span>
+                </div>
+                <p>Please wait before accessing MT5</p>
+                <p class="timer-message">Use this time to mentally prepare and visualize successful trades</p>
+            </div>
+        </div>
+
+        <!-- MT5 Access Screen -->
+        <div id="access-screen" class="screen">
+            <h2>Ready to Trade</h2>
+            <div class="access-content">
+                <div class="rules-summary">
+                    <h3>Remember Your Trading Rules:</h3>
+                    <ul id="reminder-list"></ul>
+                </div>
+                <div class="motivation-message">
+                    <p>"Trade with discipline, not emotion"</p>
+                </div>
+                <button id="open-mt5" class="primary-btn large">Open MT5</button>
+                <button id="back-to-reflection" class="secondary-btn">Back</button>
+            </div>
+        </div>
+
+        <!-- Progress Screen -->
+        <div id="progress-screen" class="screen">
+            <h2>Your Trading Progress</h2>
+            <div class="progress-stats">
+                <div class="stat-card">
+                    <h3>Sessions Completed</h3>
+                    <span id="total-sessions">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Discipline</h3>
+                    <span id="avg-discipline">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Current Streak</h3>
+                    <span id="current-streak-display">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Best Streak</h3>
+                    <span id="best-streak">0</span>
+                </div>
+            </div>
+            
+            <div class="recent-sessions">
+                <h3>Recent Sessions</h3>
+                <div id="session-history"></div>
+            </div>
+            
+            <button id="back-from-progress" class="secondary-btn">Back</button>
+        </div>
+
+        <!-- Welcome Screen for First Time Users -->
+        <div id="welcome-screen" class="screen">
+            <h2>Welcome to MT5 Discipline Tracker</h2>
+            <div class="welcome-content">
+                <p>This app will help you maintain trading discipline by:</p>
+                <ul class="welcome-list">
+                    <li>Ensuring you review your trading rules before each session</li>
+                    <li>Tracking your emotional state and learning progress</li>
+                    <li>Building consistent trading habits through accountability</li>
+                </ul>
+                <p>Let's start with your first trading session!</p>
+            </div>
+            <button id="start-first-session" class="primary-btn">Start First Session</button>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="bottom-nav">
+            <button id="nav-trade" class="nav-btn active">Trade</button>
+            <button id="nav-progress" class="nav-btn">Progress</button>
+        </nav>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
