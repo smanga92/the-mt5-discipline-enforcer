@@ -467,31 +467,77 @@ class MT5DisciplineTracker {
             reminderList.appendChild(li);
         });
     }
+	
+openMT5() {
+    // For installed Android apps, try direct app launch
+    const mt5Schemes = [
+        'metatrader5://',
+        'mt5://',
+        'net.metaquotes.metatrader5://'
+    ];
+    
+    let schemeIndex = 0;
+    
+    const tryScheme = () => {
+        if (schemeIndex < mt5Schemes.length) {
+            // Create a hidden iframe to attempt app launch
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = mt5Schemes[schemeIndex];
+            document.body.appendChild(iframe);
+            
+            // Clean up iframe after attempt
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+            
+            schemeIndex++;
+            
+            // If app didn't open (page still visible), try next scheme
+            setTimeout(() => {
+                if (document.visibilityState === 'visible' && schemeIndex < mt5Schemes.length) {
+                    tryScheme();
+                } else if (document.visibilityState === 'visible') {
+                    // If all schemes failed, show manual instruction
+                    this.showManualLaunchMessage();
+                }
+            }, 2000);
+        }
+    };
+    
+    tryScheme();
+    
+    // Log the access attempt
+    const accessLog = {
+        timestamp: new Date().toISOString(),
+        type: 'mt5_access'
+    };
+    
+    this.sessionHistory.unshift(accessLog);
+    this.saveData();
+}
 
-    openMT5() {
-       // Try to open MT5
-       const mt5Intent = 'intent:///#Intent;package=net.metaquotes.metatrader5;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
-	   
-       try {
-           window.location.href = mt5Intent;
-       } catch (error) {
-           console.log('Could not open MT5 automatically');
-       }
-       
-       // Log the MT5 access
-       const accessLog = {
-           timestamp: new Date().toISOString(),
-           type: 'mt5_access'
-       };
-       
-       this.sessionHistory.unshift(accessLog);
-       this.saveData();
-       
-       // Show success message
-       alert('MT5 should be opening now. Remember to follow your trading rules! Return here after your session for reflection.');
-   }
-
-   // Progress screen functionality
+// Add this new method
+showManualLaunchMessage() {
+    const message = `
+        MT5 ready to launch!
+        
+        Since both apps are on your device:
+        1. Switch to your home screen
+        2. Open MT5 manually
+        3. Return here after trading for reflection
+        
+        Your session has been logged.
+    `;
+    
+    if (confirm(message + "\n\nClick OK to continue, Cancel to try again")) {
+        // User acknowledged manual launch
+        alert('Remember to return here after your trading session!');
+    } else {
+        // Try again
+        this.openMT5();
+    }
+}
    updateProgressScreen() {
        // Update statistics
        document.getElementById('total-sessions').textContent = this.sessionCount;
