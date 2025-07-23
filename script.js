@@ -477,8 +477,6 @@ class MT5DisciplineTracker {
            // MT5 not found, maybe open Play Store or show error
        }
 
-       window.location.href = mt5Intent;
-
        try {
            window.location.href = mt5Intent;
        } catch (error) {
