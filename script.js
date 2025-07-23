@@ -471,7 +471,8 @@ class MT5DisciplineTracker {
     openMT5() {
        // Try to open MT5
        const mt5Intent = 'intent:///#Intent;package=net.metaquotes.metatrader5;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
-       
+       window.location.href = mt5Intent;
+
        try {
            window.location.href = mt5Intent;
        } catch (error) {
