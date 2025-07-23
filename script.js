@@ -469,74 +469,98 @@ class MT5DisciplineTracker {
     }
 	
 openMT5() {
-    // For installed Android apps, try direct app launch
-    const mt5Schemes = [
-        'metatrader5://',
-        'mt5://',
-        'net.metaquotes.metatrader5://'
+    // Multiple intent methods to launch MT5 directly
+    const launchMethods = [
+        // Method 1: Direct package launch
+        () => {
+            window.location.href = 'intent:///#Intent;package=net.metaquotes.metatrader5;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;end';
+        },
+        
+        // Method 2: Alternative intent format
+        () => {
+            window.location.href = 'intent://net.metaquotes.metatrader5/#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=net.metaquotes.metatrader5;end';
+        },
+        
+        // Method 3: Direct app protocol
+        () => {
+            const link = document.createElement('a');
+            link.href = 'intent:///#Intent;package=net.metaquotes.metatrader5;end';
+            link.click();
+        },
+        
+        // Method 4: Custom URL scheme
+        () => {
+            window.open('intent://launch/#Intent;package=net.metaquotes.metatrader5;action=android.intent.action.MAIN;end', '_system');
+        }
     ];
     
-    let schemeIndex = 0;
+    let methodIndex = 0;
+    const originalVisibility = document.visibilityState;
     
-    const tryScheme = () => {
-        if (schemeIndex < mt5Schemes.length) {
-            // Create a hidden iframe to attempt app launch
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = mt5Schemes[schemeIndex];
-            document.body.appendChild(iframe);
-            
-            // Clean up iframe after attempt
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
-            
-            schemeIndex++;
-            
-            // If app didn't open (page still visible), try next scheme
-            setTimeout(() => {
-                if (document.visibilityState === 'visible' && schemeIndex < mt5Schemes.length) {
-                    tryScheme();
-                } else if (document.visibilityState === 'visible') {
-                    // If all schemes failed, show manual instruction
-                    this.showManualLaunchMessage();
+    const tryNextMethod = () => {
+        if (methodIndex < launchMethods.length) {
+            try {
+                launchMethods[methodIndex]();
+                
+                // Check if app switched (page became hidden)
+                setTimeout(() => {
+                    if (document.visibilityState === 'hidden' || document.visibilityState !== originalVisibility) {
+                        // Success! MT5 opened
+                        console.log('MT5 launched successfully');
+                    } else if (methodIndex < launchMethods.length - 1) {
+                        // Try next method
+                        methodIndex++;
+                        tryNextMethod();
+                    } else {
+                        // All methods failed
+                        this.showInstallationInstructions();
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                methodIndex++;
+                if (methodIndex < launchMethods.length) {
+                    tryNextMethod();
+                } else {
+                    this.showInstallationInstructions();
                 }
-            }, 2000);
+            }
         }
     };
     
-    tryScheme();
+    tryNextMethod();
     
     // Log the access attempt
     const accessLog = {
         timestamp: new Date().toISOString(),
-        type: 'mt5_access'
+        type: 'mt5_launch_attempt'
     };
     
     this.sessionHistory.unshift(accessLog);
     this.saveData();
+    
+    // Show confirmation message
+    setTimeout(() => {
+        if (document.visibilityState === 'visible') {
+            alert('If MT5 didn\'t open automatically, please check if it\'s installed and try again.');
+        }
+    }, 3000);
 }
 
-// Add this new method
-showManualLaunchMessage() {
-    const message = `
-        MT5 ready to launch!
-        
-        Since both apps are on your device:
-        1. Switch to your home screen
-        2. Open MT5 manually
-        3. Return here after trading for reflection
-        
-        Your session has been logged.
+showInstallationInstructions() {
+    const instructions = `
+    MT5 Launch Failed!
+    
+    Possible solutions:
+    1. Make sure MT5 is installed on your device
+    2. Try opening MT5 once manually, then use this app
+    3. Grant this app permission to open other apps
+    4. Restart your browser/webview
+    
+    The discipline session has been logged.
     `;
     
-    if (confirm(message + "\n\nClick OK to continue, Cancel to try again")) {
-        // User acknowledged manual launch
-        alert('Remember to return here after your trading session!');
-    } else {
-        // Try again
-        this.openMT5();
-    }
+    alert(instructions);
 }
    updateProgressScreen() {
        // Update statistics
